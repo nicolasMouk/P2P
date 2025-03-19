@@ -137,9 +137,6 @@ def start_new_server(ip, port):
 def get_ip():
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    # bootstrap_interaction(action="JOIN", active_peers = active_peers) #rejoindre le réseau
-    # if active_peers is None:
-    #     return jsonify({"error": "Impossible de récupérer la liste des pairs"}), 500
     return jsonify({"message": "Rejoint avec succès", "active_peers": active_peers,"ip": request.remote_addr})
 
 @app.route("/join", methods=["POST"])

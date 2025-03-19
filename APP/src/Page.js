@@ -493,12 +493,20 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
       <h4>Port : {peerPort}</h4>
 
        {/* Pop-up explicative */}
-       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Mode Contributeur Activé</DialogTitle>
-        <DialogContent>
-          <p>Vous êtes en mode contributeur. Cela signifie que vous hébergez des fichiers sur le réseau.</p>
+       <Dialog sx={{
+    '& .MuiPaper-root': { 
+      borderRadius: '12px', 
+      padding: '20px',
+      backgroundColor: '#343a40', // Fond sombre
+      
+    }
+  }} open={open} onClose={() => setOpen(false)}>
+        <DialogTitle sx={{textAlign:'center',color: "#d9d9d9",fontSize: '2rem',fontWeight: 'bold',}}>Mode Contributeur Activé</DialogTitle>
+        <DialogContent sx={{textAlign:'center',color: "#d9d9d9"}}>
+          <p>Vous êtes en mode contributeur.</p>
+          <p> Cela signifie que vous hébergez des fichiers sur le réseau.</p>
           <p>Assurez-vous d’avoir une bonne connexion et que votre pare-feu autorise les connexions entrantes.</p>
-          <p>Veuillez dé-zipper le fichier que vous venez de télécharger et de démarrer le .bat afin de contribuer au réseau</p>
+          <p>Veuillez dé-zipper le fichier que vous venez de télécharger et de démarrer le .bat afin de contribuer au réseau !</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} color="primary">

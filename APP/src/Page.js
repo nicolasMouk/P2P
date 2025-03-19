@@ -29,9 +29,9 @@ import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material
 
 
 const Page = ({ip,peerPort,isContributor,onLogout}) => {
-  console.log("IP reçue :", ip);
-  console.log("Port reçu :", peerPort);
-  console.log("Contributor :", isContributor )
+  // console.log("IP reçue :", ip);
+  // console.log("Port reçu :", peerPort);
+  // console.log("Contributor :", isContributor )
 
   const pageStyle = {
     backgroundImage: `url(${backgroundImage})`,
@@ -265,47 +265,13 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
   // eslint-disable-next-line
   const [error, setError] = useState(null); // État pour les erreurs
   
-  
-  // const fetchFiles = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/files"); // Adapte l'URL selon ton setup
-  //     const data = await response.json();
-  
-  //     if (data.status === "success") {
-  //       // Convertir le contenu du fichier en une liste en supposant qu'il y ait une ligne par fichier
-  //       setFiles(data.content.split("\n").filter(file => file.trim() !== ""));
-  //     } else {
-  //       setError(data.message);
-  //     }
-  //   } catch (err) {
-  //     setError("Erreur lors de la récupération des fichiers.");
-  //   }
-  // };
-  // const [files, setFiles] = useState([]);
-  // const [error, setError] = useState(null);
-
-  // const fetchFiles = async () => {
-  //   try {
-  //     const response = await fetch("http://192.168.80.32:5002/list_dht"); // Utilisation de l'URL correcte
-  //     const data = await response.json();
-  
-  //     if (data.list_files_storage) {
-  //       // Transformer l'objet en une liste de paires [nom, clé]
-  //       const filesArray = Object.entries(data.list_files_storage);
-  //       setFiles(filesArray);
-  //     } else {
-  //       setError("Aucun fichier trouvé.");
-  //     }
-  //   } catch (err) {
-  //     setError("Erreur lors de la récupération des fichiers.");
-  //   }
-  // };
 
   const fetchFiles = async () => {
     try {
       const response = await fetch("http://192.168.80.32:5002/list_dht"); // API URL
       const data = await response.json();
-      
+      // console.log(response)
+      // console.log(data)
       if (data.list_files_storage) {
         // Convertir l'objet en tableau
         const filesArray = Object.entries(data.list_files_storage);
@@ -318,8 +284,6 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
     }
   };
   
-  
-    
   
   const styleFindFile = {
     left: '20%',
@@ -344,62 +308,6 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
       <Button variant ='contained' size='small' onClick={togglePopupFileInNetwork}>Close</Button>
         </>
   );
-
-// const PopUpNetwork = (
-//   <>
-//     <h2 style={contentStyle2}>Rechercher un Fichier dans le réseau</h2>
-//     <ThemeProvider theme={theme}>
-//       <TextField id="standard-basic" label="Search Field" variant="standard" />
-//     </ThemeProvider>
-//     <SearchRoundedIcon fontSize="large" />
-//     <Button
-//       style={styleFindFile}
-//       variant="contained"
-//       size="small"
-//       onClick={fetchFiles}
-//     >
-//       Find Files
-//     </Button>
-
-//     <div
-//       style={{
-//         maxHeight: "200px",
-//         overflowY: "auto",
-//         border: "1px solid #ccc",
-//         padding: "10px",
-//         borderRadius: "5px",
-//       }}
-//     >
-//       <ul style={{ listStyleType: "none", padding: 0 }}>
-//         {files.length > 0 ? (
-//           files.map(([fileName, fileKey], index) => (
-//             <li
-//               key={index}
-//               style={{
-//                 marginBottom: "10px",
-//                 wordBreak: "break-word",
-//                 color: "#d9d9d9",
-//               }}
-//             >
-//               <strong>{fileName}</strong>:{" "}
-//               <span style={{ fontSize: "0.85em", color: "#d9d9d9" }}>
-//                 {fileKey}
-//               </span>
-//             </li>
-//           ))
-//         ) : (
-//           <p>Aucun fichier disponible.</p>
-//         )}
-//       </ul>
-//     </div>
-    
-//     <Button variant="contained" size="small" onClick={togglePopupFileInNetwork}>
-//       Close
-//     </Button>
-//   </>
-// );
-
-
 
   const[rows,setRows] = useState([])
   
@@ -449,7 +357,7 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
     try {
       const response = await axios.post('http://localhost:5000/info', {peerPort: peerPort});
     
-      console.log(response.data);
+      // console.log(response.data);
       if (response.data.Status === "success") {
         setRows(response.data.data); // Stocker les données dans le state
       } else {
@@ -477,52 +385,6 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
     setFile(selectedFile);
     setMessage(""); // Reset message
   };
-
-
-    // const handleUpload = async () => {
-    //   if (!file) {
-    //     setMessage("Veuillez sélectionner un fichier !");
-    //     return;
-    //   }
-    
-    //   setLoading(true);
-    //   setMessage("Envoi en cours...");
-    
-    //   try {
-    //     // Construction de l'URL dynamique avec l'IP et le port
-    //     const uploadUrl = `http://${ip}:${peerPort}/upload`;
-    
-    //     const formData = new FormData();
-    //     formData.append("file", file);
-    //     formData.append("peerPort", peerPort);
-    
-    //     const response = await axios.post(uploadUrl, formData, {
-    //       headers: { "Content-Type": "multipart/form-data" },
-    //     });
-    
-    //     console.log("Réponse complète:", response);
-    //     console.log("Status:", response.status);
-    //     console.log("Data:", response.data);
-    
-    //     // Si status HTTP = 200, afficher succès
-    //     if (response.status === 200) {
-    //       setMessage("Upload réussi !");
-    //     } else {
-    //       setMessage(`Upload réussi mais réponse inattendue : ${response.status}`);
-    //     }
-    //   } catch (err) {
-    //     console.error("Erreur lors de l'upload :", err);
-    
-    //     if (err.response) {
-    //       console.error("Réponse erreur:", err.response);
-    //       setMessage(`Erreur: ${err.response.status} - ${err.response.data}`);
-    //     } else {
-    //       setMessage("Erreur lors de l'upload !");
-    //     }
-    //   }
-    
-    //   setLoading(false);
-    // };
     
     const handleUpload = async () => {
       if (!file) {
@@ -542,7 +404,7 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
           headers: { "Content-Type": "multipart/form-data" },
         });
   
-        console.log("Réponse complète:", response);
+        // console.log("Réponse complète:", response);
   
         if (response.status === 200) {
           setMessage("✅ Upload réussi !");
@@ -562,22 +424,50 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
     // Download
   
     const [filename, setFilename] = useState("")
-    // eslint-disable-next-line 
-    const [key, setKey] = useState("")
+    
 
     const handleDownload = async () => {
+      if (!filename) {
+        alert("Veuillez entrer une clé de fichier !");
+        return;
+      }
+    
+      // Trouver le nom du fichier correspondant à la clé
+      const fileEntry = files.find(([fileName, fileKey]) => fileKey === filename);
+    
+      if (!fileEntry) {
+        alert("Clé invalide ou fichier introuvable !");
+        return;
+      }
+    
+      const fileNameWithExtension = fileEntry[0]; // Nom du fichier avec extension
+      const extension = `.${fileNameWithExtension.split(".").pop()}`; // Extraction de l'extension
+    
       try {
-        const response = await axios.post("http://localhost:5000/download", {
-          filename: filename,peerPort:peerPort,key : key
+        const response = await axios.get(`http://192.168.80.32:5003/download?file_key=${filename}`, {
+          responseType: "blob", // On attend un fichier binaire
         });
-  
-        alert(response.data.message);
+    
+        console.log("Téléchargement du fichier :", fileNameWithExtension);
+        console.log("Extension extraite :", extension);
+    
+        // Création du lien de téléchargement
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${filename}${extension}`; // Ajout de l'extension
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
       } catch (error) {
         console.error("Erreur lors du téléchargement :", error);
         alert(error.response?.data?.error || "Une erreur est survenue");
       }
     };
     
+    
+
     const handleLogout = async () => {
       try {
         const response = await axios.post("http://localhost:5000/leave", { ip,
@@ -676,10 +566,20 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
               </CustomTabPanel>
 
               <CustomTabPanel value={value} index={1}>
-                <h1 style = {contentStyle2} >Télécharger des Fichiers</h1>
-                <ThemeProvider theme={theme} ><TextField  id="standard-basic" label="Search Field" variant="standard" value = {filename} onChange={(e)=> setFilename(e.target.value)} /></ThemeProvider>
-                <Button component = "span" size = 'large' variant ='contained' onClick={handleDownload}>Download </Button>
-              </CustomTabPanel>
+  <h1 style={contentStyle2}>Télécharger des Fichiers</h1>
+  <ThemeProvider theme={theme}>
+    <TextField
+      id="standard-basic"
+      label="Entrez la clé du fichier"
+      variant="standard"
+      value={filename}
+      onChange={(e) => setFilename(e.target.value)}
+    />
+  </ThemeProvider>
+  <Button component="span" size="large" variant="contained" onClick={handleDownload}>
+    Télécharger
+  </Button>
+</CustomTabPanel>
               </p> </div>
 
     {/* Overlay qui assombrit le fond */}

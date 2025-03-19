@@ -150,3 +150,63 @@ export default LoginPage;
 
 
 
+// import React, { useState } from 'react';
+
+// const FileList = () => {
+//   const [files, setFiles] = useState([]); // Pour stocker les données des fichiers
+//   const [error, setError] = useState(null); // Pour gérer les erreurs
+
+//   // Fonction pour récupérer les fichiers de l'API
+//   const fetchFiles = async () => {
+//     try {
+//       const response = await fetch("http://192.168.80.32:5002/list_dht"); // API URL
+//       const data = await response.json();
+//       console.log(response)
+//       console.log(data)
+//       if (data.list_files_storage) {
+//         // Convertir l'objet en tableau
+//         const filesArray = Object.entries(data.list_files_storage);
+//         setFiles(filesArray); // Mettre à jour l'état avec les données récupérées
+//       } else {
+//         setError("Aucun fichier trouvé.");
+//       }
+//     } catch (err) {
+//       setError("Erreur lors de la récupération des fichiers.");
+//     }
+//   };
+
+//   return (
+//     <div>
+//       {/* Bouton pour lancer la récupération des fichiers */}
+//       <button onClick={fetchFiles}>Find Files</button>
+
+//       {/* Affichage des fichiers sous forme de tableau */}
+//       {error && <p>{error}</p>}
+      
+//       <table border="1" style={{ width: '100%', borderCollapse: 'collapse' }}>
+//         <thead>
+//           <tr>
+//             <th>Nom du fichier</th>
+//             <th>Clé du fichier</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {files.length > 0 ? (
+//             files.map(([fileName, fileKey], index) => (
+//               <tr key={index}>
+//                 <td>{fileName}</td>
+//                 <td>{fileKey}</td>
+//               </tr>
+//             ))
+//           ) : (
+//             <tr>
+//               <td colSpan="2">Aucun fichier disponible</td>
+//             </tr>
+//           )}
+//         </tbody>
+//       </table>
+//     </div>
+//   );
+// };
+
+// export default FileList;

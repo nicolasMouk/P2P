@@ -266,23 +266,61 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
   const [error, setError] = useState(null); // État pour les erreurs
   
   
+  // const fetchFiles = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:5000/files"); // Adapte l'URL selon ton setup
+  //     const data = await response.json();
+  
+  //     if (data.status === "success") {
+  //       // Convertir le contenu du fichier en une liste en supposant qu'il y ait une ligne par fichier
+  //       setFiles(data.content.split("\n").filter(file => file.trim() !== ""));
+  //     } else {
+  //       setError(data.message);
+  //     }
+  //   } catch (err) {
+  //     setError("Erreur lors de la récupération des fichiers.");
+  //   }
+  // };
+  // const [files, setFiles] = useState([]);
+  // const [error, setError] = useState(null);
+
+  // const fetchFiles = async () => {
+  //   try {
+  //     const response = await fetch("http://192.168.80.32:5002/list_dht"); // Utilisation de l'URL correcte
+  //     const data = await response.json();
+  
+  //     if (data.list_files_storage) {
+  //       // Transformer l'objet en une liste de paires [nom, clé]
+  //       const filesArray = Object.entries(data.list_files_storage);
+  //       setFiles(filesArray);
+  //     } else {
+  //       setError("Aucun fichier trouvé.");
+  //     }
+  //   } catch (err) {
+  //     setError("Erreur lors de la récupération des fichiers.");
+  //   }
+  // };
+
   const fetchFiles = async () => {
     try {
-      const response = await fetch("http://localhost:5000/files"); // Adapte l'URL selon ton setup
+      const response = await fetch("http://192.168.80.32:5002/list_dht"); // API URL
       const data = await response.json();
-  
-      if (data.status === "success") {
-        // Convertir le contenu du fichier en une liste en supposant qu'il y ait une ligne par fichier
-        setFiles(data.content.split("\n").filter(file => file.trim() !== ""));
+      
+      if (data.list_files_storage) {
+        // Convertir l'objet en tableau
+        const filesArray = Object.entries(data.list_files_storage);
+        setFiles(filesArray); // Mettre à jour l'état avec les données récupérées
       } else {
-        setError(data.message);
+        setError("Aucun fichier trouvé.");
       }
     } catch (err) {
       setError("Erreur lors de la récupération des fichiers.");
     }
   };
   
-
+  
+    
+  
   const styleFindFile = {
     left: '20%',
   }
@@ -295,26 +333,71 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
       <Button style={styleFindFile} variant ='contained' size='small' padding='10px' onClick={fetchFiles}>Find Files</Button>
       
       <div style={{ maxHeight: "200px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", borderRadius: "5px" }}>
-  <ul style={{ listStyleType: "none", padding: 0 }}>
-    {files.length > 0 ? (
-      files.map((file, index) => {
-        const [fileName, fileKey] = file.split(" : "); // Séparation du nom et de la clé
-        return (
-          <li key={index} style={{ marginBottom: "10px", wordBreak: "break-word",color: "d9d9d9" }}>
-            <strong>{fileName}</strong>: <span style={{ fontSize: "0.85em", color: "#d9d9d9" }}>{fileKey}</span>
-          </li>
-        );
-      })
-    ) : (
-      <p>Aucun fichier disponible.</p>
-    )}
+      <ul>
+    {files.map(([fileName, fileKey], index) => (
+      <li key={index}>
+        <strong>{fileName}</strong>: <span>{fileKey}</span>
+      </li>
+    ))}
   </ul>
 </div>
-
-
       <Button variant ='contained' size='small' onClick={togglePopupFileInNetwork}>Close</Button>
         </>
   );
+
+// const PopUpNetwork = (
+//   <>
+//     <h2 style={contentStyle2}>Rechercher un Fichier dans le réseau</h2>
+//     <ThemeProvider theme={theme}>
+//       <TextField id="standard-basic" label="Search Field" variant="standard" />
+//     </ThemeProvider>
+//     <SearchRoundedIcon fontSize="large" />
+//     <Button
+//       style={styleFindFile}
+//       variant="contained"
+//       size="small"
+//       onClick={fetchFiles}
+//     >
+//       Find Files
+//     </Button>
+
+//     <div
+//       style={{
+//         maxHeight: "200px",
+//         overflowY: "auto",
+//         border: "1px solid #ccc",
+//         padding: "10px",
+//         borderRadius: "5px",
+//       }}
+//     >
+//       <ul style={{ listStyleType: "none", padding: 0 }}>
+//         {files.length > 0 ? (
+//           files.map(([fileName, fileKey], index) => (
+//             <li
+//               key={index}
+//               style={{
+//                 marginBottom: "10px",
+//                 wordBreak: "break-word",
+//                 color: "#d9d9d9",
+//               }}
+//             >
+//               <strong>{fileName}</strong>:{" "}
+//               <span style={{ fontSize: "0.85em", color: "#d9d9d9" }}>
+//                 {fileKey}
+//               </span>
+//             </li>
+//           ))
+//         ) : (
+//           <p>Aucun fichier disponible.</p>
+//         )}
+//       </ul>
+//     </div>
+    
+//     <Button variant="contained" size="small" onClick={togglePopupFileInNetwork}>
+//       Close
+//     </Button>
+//   </>
+// );
 
 
 
@@ -525,6 +608,7 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
         <DialogContent>
           <p>Vous êtes en mode contributeur. Cela signifie que vous hébergez des fichiers sur le réseau.</p>
           <p>Assurez-vous d’avoir une bonne connexion et que votre pare-feu autorise les connexions entrantes.</p>
+          <p>Veuillez dé-zipper le fichier que vous venez de télécharger et de démarrer le .bat afin de contribuer au réseau</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} color="primary">
@@ -537,8 +621,13 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
       <div style={headerStyle} className='headerStyle'>
         {/* Premier conteneur */}
         <div style={buttonContainerStyle} className='buttonContainerStyle'>
-          <Button variant="contained" size = 'large' onClick={togglePopupFileInNetwork} sx={{color:'#d9d9d9', fontWeight:"bold",background: "#343a40"}}>Fichier dans le réseau</Button>
+          {/* Bouton pour ouvrir la pop-up */}
+          <Button variant="contained" size="large" onClick={togglePopupFileInNetwork} sx={{ color: '#d9d9d9', fontWeight: 'bold', background: '#343a40' }}> Fichier dans le réseau </Button>
+          {/* Afficher la pop-up si isNetworkPopUpOpen est vrai */}
+          
           <Button variant = "contained" size = 'large' onClick={handlePrint} sx={{color:'#d9d9d9', fontWeight:"bold",background: "#343a40"}}>Informations Réseau</Button>
+          {/* <PopUpNetwork isOpen={isNetworkPopUpOpen} onClose={togglePopupFileInNetwork} /> */}
+
         </div>
         {/* Deuxième conteneur */}
         <div style={buttonContainerStyle} className='buttonContainerStyle'>

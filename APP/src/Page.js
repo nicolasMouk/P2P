@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect  } from "react";
 // import * as React from 'react';
 import backgroundImage from './assets/background2.jpg'; 
 // import myImage from './assets/dashboard.png';
@@ -23,13 +23,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 
 
 
 
-const Page = ({ip,peerPort,onLogout}) => {
+const Page = ({ip,peerPort,isContributor,onLogout}) => {
   console.log("IP reçue :", ip);
   console.log("Port reçu :", peerPort);
+  console.log("Contributor :", isContributor )
 
   const pageStyle = {
     backgroundImage: `url(${backgroundImage})`,
@@ -124,9 +126,7 @@ const Page = ({ip,peerPort,onLogout}) => {
     },
   });
 
-  // const handleFilenameChange = React.useCallback((e) => {
-  //   setFilename(e.target.value);
-  // }, []);
+  
 
   
 
@@ -170,6 +170,14 @@ const Page = ({ip,peerPort,onLogout}) => {
   const [isPopupOpen, setIsPopupOpen] = React.useState(false);
   const [isNetworkPopUpOpen, setIsNetworkPopupOpen] = React.useState(false);
   const [isNetworkInfoPopUpOpen, setIsInfoNetworkPopupOpen] = React.useState(false);
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (isContributor) {
+      setOpen(true); // Ouvrir la pop-up au chargement de la page si "contributeur" est coché
+    }
+  }, [isContributor]);
+
   // Fonction pour ouvrir ou fermer les popup
   const togglePopupProfile = () => {
     setIsPopupOpen(!isPopupOpen);
@@ -254,10 +262,10 @@ const Page = ({ip,peerPort,onLogout}) => {
   );
 
   const [files, setFiles] = useState([]); // État pour stocker les fichiers
-  const [error, setError] = useState(null); // État pour les erreurs
   // eslint-disable-next-line
-  const [loading, setLoading] = useState(false); // État pour indiquer le chargement
-
+  const [error, setError] = useState(null); // État pour les erreurs
+  
+  
   const fetchFiles = async () => {
     try {
       const response = await fetch("http://localhost:5000/files"); // Adapte l'URL selon ton setup
@@ -374,43 +382,19 @@ const Page = ({ip,peerPort,onLogout}) => {
 
    
   // Upload
-  // eslint-disable-next-line
+  
     const [file,setFile] = useState(null);
     const [message, setMessage] = useState("");
-    // const [selectedFile, setSelectedFile] = useState(null);
+    const [loading, setLoading] = useState(false); // État pour indiquer le chargement
 
-    const handleFileChangee = (event) => {
-      setFile(event.target.files[0]);
-      setMessage(""); 
-    };
 
-    
-    // const handleUpload = async () => {
-    //   if (!file) {
-    //     setMessage("Veuillez sélectionner un fichier !");
-    //     return;
-    //   }
-  
-    //   setMessage("envoie en cours");
-  
-    //   try {
-    //     const formData = new FormData();
-    //     formData.append("file", file);
-    //     formData.append("peerPort", peerPort); // Ajoute peerPort
-  
-    //     const response = await axios.post("http://localhost:5000/upload", formData, {
-    //       headers: { "Content-Type": "multipart/form-data" },
-    //     });
-    //     console.log(response.data);
-  
-    //     setMessage("Upload réussi !");
-    //   } catch (err) {
-    //     console.error("Erreur lors de l'upload :", err);
-    //     setMessage("Erreur lors de l'upload !");
-    //   }
-  
-    //   // setLoading(false);
-    // };
+    // Fonction pour gérer le changement de fichier
+  const handleFileChangee = (event) => {
+    const selectedFile = event.target.files[0];
+    setFile(selectedFile);
+    setMessage(""); // Reset message
+  };
+
 
     // const handleUpload = async () => {
     //   if (!file) {
@@ -422,79 +406,75 @@ const Page = ({ip,peerPort,onLogout}) => {
     //   setMessage("Envoi en cours...");
     
     //   try {
+    //     // Construction de l'URL dynamique avec l'IP et le port
+    //     const uploadUrl = `http://${ip}:${peerPort}/upload`;
+    
     //     const formData = new FormData();
     //     formData.append("file", file);
     //     formData.append("peerPort", peerPort);
     
-    //     const response = await axios.post("http://localhost:5000/upload", formData, {
+    //     const response = await axios.post(uploadUrl, formData, {
     //       headers: { "Content-Type": "multipart/form-data" },
     //     });
-    //     console.log(response.data);
     
-    //     setMessage("Upload réussi !");
+    //     console.log("Réponse complète:", response);
+    //     console.log("Status:", response.status);
+    //     console.log("Data:", response.data);
+    
+    //     // Si status HTTP = 200, afficher succès
+    //     if (response.status === 200) {
+    //       setMessage("Upload réussi !");
+    //     } else {
+    //       setMessage(`Upload réussi mais réponse inattendue : ${response.status}`);
+    //     }
     //   } catch (err) {
     //     console.error("Erreur lors de l'upload :", err);
-    //     setMessage("Erreur lors de l'upload !");
+    
+    //     if (err.response) {
+    //       console.error("Réponse erreur:", err.response);
+    //       setMessage(`Erreur: ${err.response.status} - ${err.response.data}`);
+    //     } else {
+    //       setMessage("Erreur lors de l'upload !");
+    //     }
     //   }
     
     //   setLoading(false);
     // };
-
+    
     const handleUpload = async () => {
       if (!file) {
         setMessage("Veuillez sélectionner un fichier !");
         return;
       }
-    
+  
       setLoading(true);
       setMessage("Envoi en cours...");
-    
+  
       try {
+        const uploadUrl = `http://192.168.80.32:5003/upload`;
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("peerPort", peerPort);
-    
-        const response = await axios.post("http://localhost:5000/upload", formData, {
+  
+        const response = await axios.post(uploadUrl, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-    
-        console.log(response.data);
-        setMessage("Upload réussi !");
+  
+        console.log("Réponse complète:", response);
+  
+        if (response.status === 200) {
+          setMessage("✅ Upload réussi !");
+        } else {
+          setMessage(`⚠️ Réponse inattendue : ${response.status}`);
+        }
       } catch (err) {
         console.error("Erreur lors de l'upload :", err);
-        setMessage("Erreur lors de l'upload !");
+        setMessage("❌ Erreur lors de l'upload !");
       }
-    
+  
       setLoading(false);
     };
-    
-    
 
-    // const handleFileChange = async (e) => {
-    //   const selectedFile = e.target.files[0];
-    //   if (!selectedFile) return;
   
-    //   setFile(selectedFile);
-  
-    //   const formData = new FormData();
-    //   formData.append("file", selectedFile);
-  
-    //   try {
-    //     const response = await fetch("http://localhost:5000/upload", {
-    //       method: "POST",
-    //       body: formData,
-    //     });
-  
-    //     if (response.ok) {
-    //       alert("Fichier uploadé avec succès !");
-    //     } else {
-    //       alert("Erreur lors de l'upload.");
-    //     }
-    //   } catch (error) {
-    //     console.error("Erreur:", error);
-    //     alert("Impossible de se connecter au serveur.");
-    //   }
-    // };
 
     // Download
   
@@ -538,6 +518,21 @@ const Page = ({ip,peerPort,onLogout}) => {
       <h1>Bienvenue sur NodeLink !</h1>
       <h3>Connecté à : {ip}</h3>
       <h4>Port : {peerPort}</h4>
+
+       {/* Pop-up explicative */}
+       <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Mode Contributeur Activé</DialogTitle>
+        <DialogContent>
+          <p>Vous êtes en mode contributeur. Cela signifie que vous hébergez des fichiers sur le réseau.</p>
+          <p>Assurez-vous d’avoir une bonne connexion et que votre pare-feu autorise les connexions entrantes.</p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="primary">
+            Fermer
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Header en haut à droite */}
       <div style={headerStyle} className='headerStyle'>
         {/* Premier conteneur */}
@@ -567,29 +562,7 @@ const Page = ({ip,peerPort,onLogout}) => {
               <CustomTabPanel value={value} index={0}>
               <h1 style = {contentStyle2} className='contentStyle2'>Charger des Fichiers</h1>
               <p style ={contentStyle} className='contentStyle'>
-              {/* <div>
-              <input type="file" onChange={handleFileChangee} style={{ display: "none" }} id="file-input"/>
-               <label htmlFor="file-input">
-              <Button component="span" size="large" variant="contained" onClick={handleUpload} startIcon={<CloudUploadIcon />}>
-              Upload
-              </Button>
-              </label>
-              </div>  */}
-
-              {/* <div>
-                <input type="file" onChange={handleFileChangee} style={{ display: "none" }} id="file-input" />
-                <label htmlFor="file-input">
-                  <Button component="span" size="large" variant="contained" startIcon={<CloudUploadIcon />}>
-                    Choisir un fichier
-                  </Button>
-                </label>
-                {file && <p style={contentStyle2}>Fichier sélectionné : {file.name}</p>}
-
-                <Button variant="contained" color="primary" onClick={handleUpload}>
-                  Uploader
-                </Button>
-                {message && <p style = {contentStyle2}>{message}</p>}
-             </div> */}
+             
 
             <div>
               <input type="file" onChange={handleFileChangee} style={{ display: "none" }} id="file-input" />

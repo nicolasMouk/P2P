@@ -4,11 +4,14 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import {Checkbox, FormControlLabel} from "@mui/material";
+
 
 const LoginPage = ({ onLogin }) => {
   
   const [ip, setIp] = useState("");
   const [peerPort, setPeerPort] = useState("");
+  const [isContributor, setIsContributor] = useState(false);
 
   useEffect(() => {
     const fetchIp = async () => {
@@ -24,26 +27,34 @@ const LoginPage = ({ onLogin }) => {
     fetchIp();
   }, []);
 
-    const handleLogin = async () => {
-      
-    console.log("Tentative de connexion avec IP:", ip, "et Port:", peerPort);
-    if (ip && peerPort) {
-      try {
-        // Envoi de la requête pour rejoindre le réseau avec l'adresse IP
-        const response = await axios.post("http://localhost:5000/join", { peer_port: peerPort,
-          ip: ip,
-        });
-        console.log("Réponse du serveur:", response.data);
-        onLogin(ip,peerPort);
-      } catch (error) {
-        console.error("Erreur lors de la connexion au réseau :", error);
-        alert("Erreur lors de la tentative de connexion au réseau.");
+ 
+  const handleLogin = async () => {
+    try {
+      if (isContributor) {
+        const response = await fetch(`http://192.168.80.32:5003/download_server_start`,); //MODIFIER IP ET PORT ICI
+        console.log(response.data)
+        if (!response.ok) {
+          throw new Error("Erreur lors du téléchargement du fichier");
+        }
+  
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "server_files.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
       }
-    } else {
-      alert("Veuillez entrer une adresse IP et un port.");
+    } catch (error) {
+      console.error("Erreur:", error);
+    } finally {
+      // Exécuter onLogin dans tous les cas
+      onLogin(ip, peerPort, isContributor);
     }
   };
-  
+
   const theme = createTheme({
     components: {
       MuiTextField: {
@@ -108,6 +119,24 @@ const LoginPage = ({ onLogin }) => {
           sx={{ marginBottom: 2, width: "300px" }}
         />
 
+      <FormControlLabel
+        control={<Checkbox
+          checked={isContributor}
+          onChange={(e) => setIsContributor(e.target.checked)}
+          sx={{
+            color: "white", // Couleur de l'icône non cochée
+            "&.Mui-checked": {
+              color: "white", // Couleur de l'icône cochée
+            },
+            "& .MuiSvgIcon-root": {
+              border: "2px solid white", // Bordure blanche
+              borderRadius: "4px", // Coins arrondis
+            },
+          }}
+        />}
+        label="Contributeur (héberger des fichiers)"
+      />
+
       </ThemeProvider>
       <Button variant="contained" onClick={handleLogin}>
         Se Connecter
@@ -118,4 +147,6 @@ const LoginPage = ({ onLogin }) => {
 
 
 export default LoginPage;
+
+
 

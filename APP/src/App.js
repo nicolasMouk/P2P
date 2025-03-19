@@ -6,11 +6,13 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [ip, setIp] = useState("");
   const [peerPort, setPeerPort] = useState("");
+   const [isContributor, setIsContributor] = useState(false);
 
-  const handleLogin = (enteredIp,enteredPort) => {
+  const handleLogin = (enteredIp,enteredPort,isContributor) => {
     console.log("Données reçues dans handleLogin:", enteredIp, enteredPort);
     setIp(enteredIp);
     setPeerPort(enteredPort);
+    setIsContributor(isContributor)
     setIsLoggedIn(true);
   };
 
@@ -22,7 +24,7 @@ const App = () => {
 
   return (
     <div>
-      {isLoggedIn ? <Page ip={ip} peerPort={peerPort} onLogout={handleLogout} /> : <LoginPage onLogin={handleLogin} />}
+      {isLoggedIn ? <Page ip={ip} peerPort={peerPort} isContributor={isContributor} onLogout={handleLogout} /> : <LoginPage onLogin={handleLogin} />}
 
     </div>
     

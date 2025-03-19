@@ -40,12 +40,12 @@ def load_variable_json(PEER_PORT, variable):
             
             if variable == "responsability_plage" and isinstance(result, list) and len(result) == 2:
                 result = (result[0], None if result[1] is None else result[1])
-                print(f"Variable '{variable}' transformée en tuple : {result}")
+                # print(f"Variable '{variable}' transformée en tuple : {result}")
             
-            print(f"Variable '{variable}' chargée avec succès.")
+            # print(f"Variable '{variable}' chargée avec succès.")
             return result
         else:
-            print(f"La variable '{variable}' n'existe pas dans le fichier.")
+            # print(f"La variable '{variable}' n'existe pas dans le fichier.")
             return None
     else:
         print(f"Le fichier {file_path} n'existe pas.")

@@ -1,7 +1,5 @@
 import React, { useState,useEffect  } from "react";
-// import * as React from 'react';
 import backgroundImage from './assets/background2.jpg'; 
-// import myImage from './assets/dashboard.png';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
@@ -23,7 +21,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Typography,Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import StorageIcon from "@mui/icons-material/Storage"; // Icône pour les fichiers
+import DevicesIcon from "@mui/icons-material/Devices"; // Icône pour les noeuds
 
 
 
@@ -171,7 +171,10 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
   const [isNetworkPopUpOpen, setIsNetworkPopupOpen] = React.useState(false);
   const [isNetworkInfoPopUpOpen, setIsInfoNetworkPopupOpen] = React.useState(false);
   const [open, setOpen] = useState(false)
-
+  const [loading, setLoading] = useState(false); // État pour indiquer le chargement
+  const [message, setMessage] = useState("");
+  
+  
   useEffect(() => {
     if (isContributor) {
       setOpen(true); // Ouvrir la pop-up au chargement de la page si "contributeur" est coché
@@ -268,8 +271,13 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
 
   const fetchFiles = async () => {
     try {
-      const response = await fetch("http://192.168.80.32:5002/list_dht"); // API URL
+      const response = await fetch("https://5466-163-5-3-4.ngrok-free.app/list_dht",{
+        headers: {
+          "ngrok-skip-browser-warning": "true", // Ajouter l'en-tête ngrok
+        },
+      }); // API URL
       const data = await response.json();
+      setIsNetworkPopupOpen(!isNetworkPopUpOpen);
       // console.log(response)
       // console.log(data)
       if (data.list_files_storage) {
@@ -283,32 +291,69 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
       setError("Erreur lors de la récupération des fichiers.");
     }
   };
-  
-  
-  const styleFindFile = {
-    left: '20%',
-  }
+   
 
   const PopUpNetwork = (
     <>
-      <h2 style={contentStyle2}>Rechercher un Fichier dans le réseau</h2>
-      <ThemeProvider theme={theme} ><TextField  id="standard-basic" label="Search Field" variant="standard"/></ThemeProvider> 
-      <SearchRoundedIcon fontSize="large"></SearchRoundedIcon>
-      <Button style={styleFindFile} variant ='contained' size='small' padding='10px' onClick={fetchFiles}>Find Files</Button>
-      
-      <div style={{ maxHeight: "200px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", borderRadius: "5px" }}>
-      <ul>
-    {files.map(([fileName, fileKey], index) => (
-      <li key={index}>
-        <strong>{fileName}</strong>: <span>{fileKey}</span>
-      </li>
-    ))}
-  </ul>
-</div>
-      <Button variant ='contained' size='small' onClick={togglePopupFileInNetwork}>Close</Button>
-        </>
-  );
+       <Box sx={{ padding: 2 }}>
+      <Typography variant="h5" sx={{ marginBottom: 2, textAlign:"center" }}>
+        Rechercher un Fichier dans le Réseau
+      </Typography>
 
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 2 }}>
+        <SearchRoundedIcon fontSize="large" />
+        {/* <Button 
+          variant="contained" 
+          size="small" 
+          onClick={fetchFiles} 
+          disabled={loading}
+          sx={{ padding: "10px" }}
+        >
+          {loading ? "Recherche..." : "Find Files"}
+        </Button> */}
+      </Box>
+
+      {/* Affichage des fichiers trouvés */}
+      {loading && <CircularProgress sx={{ marginTop: 2 }} />}
+      
+      {/* {message && <Typography sx={{ color: "red", marginTop: 2 }}>{message}</Typography>} */}
+      
+
+      <Box
+        sx={{
+          maxHeight: "200px",
+          overflowY: "auto",
+          border: "1px solid #ccc",
+          padding: 2,
+          borderRadius: "5px",
+          marginTop: 2,
+        }}
+      >
+        <ul>
+          {files.length > 0 ? (
+            files.map(([fileName, fileKey], index) => (
+              <li key={index}>
+                <strong>{fileName}</strong>: <span>{fileKey}</span>
+              </li>
+            ))
+          ) : (
+            <li>Aucun fichier trouvé</li>
+          )}
+        </ul>
+      </Box>
+
+      {/* Bouton Close */}
+      <Button 
+        variant="contained" 
+        size="small" 
+        onClick={togglePopupFileInNetwork} 
+        sx={{ marginTop: 2 }}
+      >
+        Close
+      </Button>
+    </Box>        </>
+  );
+ // eslint-disable-next-line
   const[rows,setRows] = useState([])
   
 
@@ -350,34 +395,50 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
     </>
   );
 
-  // const [open,setOpen] = useState(false);
   // const [networkData, setNeworkData] = useState(null);
+  const [networkInfo, setNetworkInfo] = useState(null); // Stocker les données du réseau
+
+  // const handlePrint = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await axios.get("https://5466-163-5-3-4.ngrok-free.app/info");
+  //     setNetworkInfo(response.data); // Stocker les données reçues
+  //     // setOpen(true); // Ouvrir la popup
+  //     setOpenNetworkDialog(true); // Ouvre seulement ce Dialog
+  //   } catch (error) {
+  //     console.error("Erreur lors de la récupération des infos réseau :", error);
+  //     alert("Impossible de récupérer les informations réseau.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handlePrint = async () => {
+    setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/info', {peerPort: peerPort});
-    
-      // console.log(response.data);
-      if (response.data.Status === "success") {
-        setRows(response.data.data); // Stocker les données dans le state
-      } else {
-        console.error("Erreur API :", response.data.message);
-      }
-      setIsInfoNetworkPopupOpen(!isNetworkInfoPopUpOpen)
-      
-    } catch (err) {
-      console.error("Erreur API :", err);
+      const response = await axios.get("https://5466-163-5-3-4.ngrok-free.app/info", {
+        headers: {
+          "ngrok-skip-browser-warning": "true", // Ajoute cet en-tête personnalisé
+        }
+      });
+      setNetworkInfo(response.data); // Stocker les données reçues
+      setOpenNetworkDialog(true); // Ouvre seulement ce Dialog
+    } catch (error) {
+      console.error("Erreur lors de la récupération des infos réseau :", error);
+      alert("Impossible de récupérer les informations réseau.");
+    } finally {
+      setLoading(false);
     }
-    
   };
+  
+  
 
    
   // Upload
   
     const [file,setFile] = useState(null);
-    const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false); // État pour indiquer le chargement
-
+    
+    const [openNetworkDialog, setOpenNetworkDialog] = useState(false);
 
     // Fonction pour gérer le changement de fichier
   const handleFileChangee = (event) => {
@@ -396,12 +457,16 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
       setMessage("Envoi en cours...");
   
       try {
-        const uploadUrl = `http://192.168.80.32:5003/upload`;
+        const uploadUrl = `https://5466-163-5-3-4.ngrok-free.app/upload`;
         const formData = new FormData();
         formData.append("file", file);
   
         const response = await axios.post(uploadUrl, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "multipart/form-data", // Nécessaire pour l'upload de fichiers
+             // Ajout de l'en-tête personnalisé pour ngrok
+          },
         });
   
         // console.log("Réponse complète:", response);
@@ -444,7 +509,11 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
       const extension = `.${fileNameWithExtension.split(".").pop()}`; // Extraction de l'extension
     
       try {
-        const response = await axios.get(`http://192.168.80.32:5003/download?file_key=${filename}`, {
+        setLoading(true)
+        const response = await axios.get(`https://5466-163-5-3-4.ngrok-free.app/download?file_key=${filename}`, {
+          headers: {
+            "ngrok-skip-browser-warning": "true", // Ajouter l'en-tête ngrok
+          },
           responseType: "blob", // On attend un fichier binaire
         });
     
@@ -460,9 +529,12 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+
       } catch (error) {
         console.error("Erreur lors du téléchargement :", error);
         alert(error.response?.data?.error || "Une erreur est survenue");
+      } finally {
+        setLoading(false); // Désactivation du chargement
       }
     };
     
@@ -489,8 +561,7 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
 
 <div className='pageStyle' style={pageStyle}>
       <h1>Bienvenue sur NodeLink !</h1>
-      <h3>Connecté à : {ip}</h3>
-      <h4>Port : {peerPort}</h4>
+      
 
        {/* Pop-up explicative */}
        <Dialog sx={{
@@ -507,6 +578,7 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
           <p> Cela signifie que vous hébergez des fichiers sur le réseau.</p>
           <p>Assurez-vous d’avoir une bonne connexion et que votre pare-feu autorise les connexions entrantes.</p>
           <p>Veuillez dé-zipper le fichier que vous venez de télécharger et de démarrer le .bat afin de contribuer au réseau !</p>
+          <p> Pour quitter le réseau, veuillez faire un CTRL + C pour éteindre le peer.</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} color="primary">
@@ -515,17 +587,59 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
         </DialogActions>
       </Dialog>
 
+  <Dialog sx={{
+    '& .MuiPaper-root': { 
+      borderRadius: '12px', 
+      padding: '20px',
+      backgroundColor: '#343a40', // Fond sombre
+      
+    }
+  }} open={openNetworkDialog} onClose={() => setOpenNetworkDialog(false)}>
+        
+  <DialogTitle sx={{textAlign:'center',color: "#d9d9d9",fontSize: '2rem',fontWeight: 'bold'}}>Informations Réseau</DialogTitle>
+  
+  <DialogContent sx={{ textAlign: "center", color: "#d9d9d9" }}>
+  {loading ? (
+    <CircularProgress />
+  ) : networkInfo ? (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {/* Nombre de fichiers */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <StorageIcon sx={{ color: "#64b5f6" }} /> {/* Icône de disque */}
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+          Nombre de fichiers :
+        </Typography>
+        <Typography variant="h6">{networkInfo.nombre_fichier}</Typography>
+      </Box>
+
+      {/* Nombre de noeuds */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <DevicesIcon sx={{ color: "#81c784" }} /> {/* Icône d'ordinateurs */}
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+          Nombre de noeuds :
+        </Typography>
+        <Typography variant="h6">{networkInfo.nombre_noeud}</Typography>
+      </Box>
+    </Box>
+  ) : (
+    <Typography>Aucune information disponible</Typography>
+  )}
+</DialogContent>
+
+  <DialogActions>
+    <Button onClick={() => setOpenNetworkDialog(false)} color="primary">Fermer</Button>
+  </DialogActions>
+</Dialog>
+
       {/* Header en haut à droite */}
       <div style={headerStyle} className='headerStyle'>
         {/* Premier conteneur */}
         <div style={buttonContainerStyle} className='buttonContainerStyle'>
           {/* Bouton pour ouvrir la pop-up */}
-          <Button variant="contained" size="large" onClick={togglePopupFileInNetwork} sx={{ color: '#d9d9d9', fontWeight: 'bold', background: '#343a40' }}> Fichier dans le réseau </Button>
+          <Button variant="contained" size="large" onClick= {fetchFiles}  sx={{ color: '#d9d9d9', fontWeight: 'bold', background: '#343a40' }}> Fichier dans le réseau </Button>
           {/* Afficher la pop-up si isNetworkPopUpOpen est vrai */}
+          <Button variant="contained" size="large" onClick={handlePrint} sx={{ color: '#d9d9d9', fontWeight: "bold", background: "#343a40" }} disabled={loading}> {loading ? "Chargement..." : "Informations Réseau"} </Button>
           
-          <Button variant = "contained" size = 'large' onClick={handlePrint} sx={{color:'#d9d9d9', fontWeight:"bold",background: "#343a40"}}>Informations Réseau</Button>
-          {/* <PopUpNetwork isOpen={isNetworkPopUpOpen} onClose={togglePopupFileInNetwork} /> */}
-
         </div>
         {/* Deuxième conteneur */}
         <div style={buttonContainerStyle} className='buttonContainerStyle'>
@@ -550,16 +664,16 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
               <h1 style = {contentStyle2} className='contentStyle2'>Charger des Fichiers</h1>
               <p style ={contentStyle} className='contentStyle'>
              
-
+{/* 
             <div>
               <input type="file" onChange={handleFileChangee} style={{ display: "none" }} id="file-input" />
               <label htmlFor="file-input">
-                <Button component="span" size="large" variant="contained" startIcon={<CloudUploadIcon />}>
+                <Button  component="span" size="large" variant="contained" startIcon={<CloudUploadIcon />}>
                   Choisir un fichier
                 </Button>
               </label>
 
-              {file && <p style={contentStyle2}>Fichier sélectionné : {file.name}</p>}
+              {file && <p >Fichier sélectionné : {file.name}</p>}
 
               <Button variant="contained" color="primary" onClick={handleUpload} disabled={loading}>
                 {loading ? "Envoi..." : "Uploader"}
@@ -568,12 +682,52 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
               {loading && <CircularProgress style={{ marginTop: "10px" }} />}
 
               {message && <p style={contentStyle2}>{message}</p>}
-            </div>
+            </div> */}
+
+<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <input 
+        type="file" 
+        onChange={handleFileChangee} 
+        style={{ display: "none" }} 
+        id="file-input" 
+      />
+      <label htmlFor="file-input">
+        <Button 
+          component="span" 
+          size="large" 
+          variant="contained" 
+          startIcon={<CloudUploadIcon />} 
+          sx={{ width: 200 }}  // Optionnel : ajuster la taille du bouton
+        >
+          Choisir un fichier
+        </Button>
+      </label>
+
+      {file && (
+        <Typography variant="body1" sx={{ margin: '10px ',color:"#d9d9d9"  }}>
+          Fichier sélectionné : {file.name}
+        </Typography>
+      )}
+
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={handleUpload} 
+        disabled={loading} 
+        sx={{ width: 200,color:"#d9d9d9" }}  // Optionnel : ajuster la taille du bouton
+      >
+        {loading ? "Envoi..." : "Uploader"}
+      </Button>
+
+      {loading && <CircularProgress sx={{ marginTop: '10px' }} />}
+
+      {message && <Typography variant="body2" sx={{ marginTop: '10px', color: 'white' }}>{message}</Typography>}
+    </Box>
 
               </p> 
               </CustomTabPanel>
 
-              <CustomTabPanel value={value} index={1}>
+              {/* <CustomTabPanel value={value} index={1}> 
   <h1 style={contentStyle2}>Télécharger des Fichiers</h1>
   <ThemeProvider theme={theme}>
     <TextField
@@ -584,10 +738,43 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
       onChange={(e) => setFilename(e.target.value)}
     />
   </ThemeProvider>
-  <Button component="span" size="large" variant="contained" onClick={handleDownload}>
-    Télécharger
-  </Button>
-</CustomTabPanel>
+  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    <Button component="span" size="large" variant="contained" onClick={handleDownload} disabled={loading}>
+      {loading ? "Téléchargement..." : "Télécharger"}
+    </Button>
+    {loading && <CircularProgress size={24} />}
+  </div>
+</CustomTabPanel> */}
+<CustomTabPanel value={value} index={1}> 
+<h1 style={contentStyle2}>Télécharger des Fichiers</h1>
+      
+      <ThemeProvider theme={theme}>
+        <TextField
+          id="standard-basic"
+          label="Entrez la clé du fichier"
+          variant="standard"
+          value={filename}
+          onChange={(e) => setFilename(e.target.value)}
+          fullWidth
+          sx={{ marginBottom: 2 }}  // Ajout d'une marge en bas du TextField
+        />
+      </ThemeProvider>
+
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Button 
+          component="span" 
+          size="large" 
+          variant="contained" 
+          onClick={handleDownload} 
+          disabled={loading} 
+          sx={{ width: 200 }} // Largeur du bouton pour plus de consistance
+        >
+          {loading ? "Téléchargement..." : "Télécharger"}
+        </Button>
+        
+        {loading && <CircularProgress size={24} />}
+      </Box>
+    </CustomTabPanel>
               </p> </div>
 
     {/* Overlay qui assombrit le fond */}

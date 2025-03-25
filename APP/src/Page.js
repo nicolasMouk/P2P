@@ -663,26 +663,7 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
               <CustomTabPanel value={value} index={0}>
               <h1 style = {contentStyle2} className='contentStyle2'>Charger des Fichiers</h1>
               <p style ={contentStyle} className='contentStyle'>
-             
-{/* 
-            <div>
-              <input type="file" onChange={handleFileChangee} style={{ display: "none" }} id="file-input" />
-              <label htmlFor="file-input">
-                <Button  component="span" size="large" variant="contained" startIcon={<CloudUploadIcon />}>
-                  Choisir un fichier
-                </Button>
-              </label>
-
-              {file && <p >Fichier sélectionné : {file.name}</p>}
-
-              <Button variant="contained" color="primary" onClick={handleUpload} disabled={loading}>
-                {loading ? "Envoi..." : "Uploader"}
-              </Button>
-
-              {loading && <CircularProgress style={{ marginTop: "10px" }} />}
-
-              {message && <p style={contentStyle2}>{message}</p>}
-            </div> */}
+ 
 
 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
       <input 
@@ -727,24 +708,6 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
               </p> 
               </CustomTabPanel>
 
-              {/* <CustomTabPanel value={value} index={1}> 
-  <h1 style={contentStyle2}>Télécharger des Fichiers</h1>
-  <ThemeProvider theme={theme}>
-    <TextField
-      id="standard-basic"
-      label="Entrez la clé du fichier"
-      variant="standard"
-      value={filename}
-      onChange={(e) => setFilename(e.target.value)}
-    />
-  </ThemeProvider>
-  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-    <Button component="span" size="large" variant="contained" onClick={handleDownload} disabled={loading}>
-      {loading ? "Téléchargement..." : "Télécharger"}
-    </Button>
-    {loading && <CircularProgress size={24} />}
-  </div>
-</CustomTabPanel> */}
 <CustomTabPanel value={value} index={1}> 
 <h1 style={contentStyle2}>Télécharger des Fichiers</h1>
       
@@ -755,6 +718,7 @@ const Page = ({ip,peerPort,isContributor,onLogout}) => {
           variant="standard"
           value={filename}
           onChange={(e) => setFilename(e.target.value)}
+          autoFocus
           fullWidth
           sx={{ marginBottom: 2 }}  // Ajout d'une marge en bas du TextField
         />
